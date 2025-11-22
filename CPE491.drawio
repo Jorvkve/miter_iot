@@ -1,0 +1,148 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0" version="27.2.0">
+  <diagram name="Page-1" id="hbW8jUihv4WcqdopnhPj">
+    <mxGraphModel dx="3151" dy="1680" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-33" value="" style="whiteSpace=wrap;strokeWidth=1;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="501" y="1255" width="257" height="212" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-34" value="" style="whiteSpace=wrap;strokeWidth=1;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="486" y="557" width="286" height="644" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-35" value="เครือข่าย (Network)" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="509" y="399" width="240" height="104" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-36" value="" style="whiteSpace=wrap;strokeWidth=1;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="384" y="133" width="336" height="212" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-37" value="ESP32-CAM" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="486" y="158" width="138" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-38" value="มิเตอร์ไฟฟ้า" style="rounded=1;arcSize=20;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="426" y="266" width="109" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-39" value="SIM800L" style="rounded=1;arcSize=20;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="586" y="266" width="87" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-40" value="Backend Server" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="544" y="424" width="170" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-41" value="API Handler" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="557" y="582" width="144" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-42" value="OCR (Tesseract.js)" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="533" y="690" width="191" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-43" value="Data Processing" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="543" y="798" width="172" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-44" value="ฐานข้อมูล MySQL" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="541" y="906" width="176" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-45" value="API: GET /meter-data" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="521" y="1014" width="216" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-46" value="เบราว์เซอร์ผู้ใช้" style="rounded=1;arcSize=20;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="565" y="1122" width="128" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-47" value="Google Charts API" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="536" y="1280" width="187" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-48" value="แดชบอร์ด" style="whiteSpace=wrap;strokeWidth=4;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="566" y="1388" width="126" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-49" value="1. ถ่ายภาพมิเตอร์ไฟฟ้า" style="curved=1;startArrow=none;endArrow=block;exitX=0.23;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-37" target="nUr3ZHsKwlWQx-5ess5l-38">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="481" y="239" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-50" value="2. ส่งภาพ (HTTP POST)" style="curved=1;startArrow=none;endArrow=block;exitX=0.77;exitY=1;entryX=0.49;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-37" target="nUr3ZHsKwlWQx-5ess5l-39">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="629" y="239" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-51" value="3. เชื่อมต่อผ่าน GPRS/4G" style="curved=1;startArrow=none;endArrow=block;exitX=0.49;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-39" target="nUr3ZHsKwlWQx-5ess5l-40">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-52" value="4. รับไฟล์ (API: POST /upload)" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-40" target="nUr3ZHsKwlWQx-5ess5l-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-53" value="5. ประมวลผลภาพ" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-41" target="nUr3ZHsKwlWQx-5ess5l-42">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-54" value="6. ดึงข้อความ (ตัวเลขจาก OCR)" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-42" target="nUr3ZHsKwlWQx-5ess5l-43">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-55" value="7. บันทึกข้อมูล (INSERT)" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-43" target="nUr3ZHsKwlWQx-5ess5l-44">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-56" value="9. ขอข้อมูล (SELECT)" style="curved=1;startArrow=none;endArrow=block;exitX=0.64;exitY=0;entryX=0.67;entryY=1;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-45" target="nUr3ZHsKwlWQx-5ess5l-44">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690" y="987" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-57" value="10. ส่งข้อมูล" style="curved=1;startArrow=none;endArrow=block;exitX=0.33;exitY=1;entryX=0.36;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-44" target="nUr3ZHsKwlWQx-5ess5l-45">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="568" y="987" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-58" value="11. ส่งข้อมูลให้ Client" style="curved=1;startArrow=none;endArrow=block;exitX=0.36;exitY=1;entryX=0.26;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-45" target="nUr3ZHsKwlWQx-5ess5l-46">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="568" y="1095" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-59" value="8. โหลดหน้าเว็บ" style="curved=1;startArrow=none;endArrow=block;exitX=0.74;exitY=0;entryX=0.64;entryY=1;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-46" target="nUr3ZHsKwlWQx-5ess5l-45">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690" y="1095" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-60" value="12. รับข้อมูล (ค่าที่ประมวลผลแล้ว)" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-46" target="nUr3ZHsKwlWQx-5ess5l-47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-61" value="13. แสดงผลกราฟ" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;strokeWidth=4;fontFamily=Helvetica;" edge="1" parent="1" source="nUr3ZHsKwlWQx-5ess5l-47" target="nUr3ZHsKwlWQx-5ess5l-48">
+          <mxGeometry x="0.0742" relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-67" value="&lt;span style=&quot;font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;ผู้ใช้งาน (Frontend)&lt;/font&gt;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;align=center;fontFamily=Helvetica;labelBackgroundColor=default;" vertex="1" parent="1">
+          <mxGeometry x="574.5" y="1240" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-69" value="&lt;span style=&quot;text-wrap-mode: nowrap; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;Backend Server (Node.js)&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;align=center;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="574.5" y="543" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-70" value="&lt;span style=&quot;text-wrap-mode: nowrap; background-color: rgb(255, 255, 255);&quot;&gt;เครือข่าย (Network)&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;align=center;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="573.5" y="383" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="nUr3ZHsKwlWQx-5ess5l-71" value="&lt;span style=&quot;text-wrap-mode: nowrap; background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;อุปกรณ์ (Device)&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;align=center;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="500" y="128" width="110" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

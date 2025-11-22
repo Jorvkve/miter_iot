@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Meter Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .meter-img { max-width: 100px; height: auto; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-4 text-center">⚡ Dashboard มิเตอร์ไฟฟ้าอัจฉริยะ</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">กราฟแสดงการใช้ไฟฟ้าล่าสุด</h5>
+                        <div id="chart_div" style="height: 300px;">
+                            <p class="text-muted text-center py-5">กำลังโหลดข้อมูลกราฟ...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">รายการอ่านค่าล่าสุด</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="readingsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>เวลาที่บันทึก</th>
+                                <th>บ้าน</th>
+                                <th>ค่ามิเตอร์ (หน่วย)</th>
+                                <th>รูปภาพ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        // --- ส่วน Google Charts ---
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(fetchReadings); // โหลดเสร็จแล้วค่อยไปดึงข้อมูล
+
+        let rawData = []; // ตัวแปรเก็บข้อมูลดิบไว้ใช้ทั้งในตารางและกราฟ
+
+        function drawChart() {
+            if (rawData.length === 0) return;
+
+            // 1. สร้าง DataTable แบบกำหนดชนิดข้อมูลชัดเจน (วิธีนี้แก้ปัญหา Type มั่วได้ชะงัดนัก)
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Time');
+            data.addColumn('number', 'House 1');
+            data.addColumn('number', 'House 2');
+            data.addColumn('number', 'House 3');
+
+            const reversedData = [...rawData].reverse();
+
+            reversedData.forEach(item => {
+                const time = new Date(item.reading_time);
+                const timeLabel = time.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                // เตรียมตัวแปรเก็บค่า (เริ่มต้นเป็น null คือไม่มีข้อมูล)
+                let val1 = null;
+                let val2 = null;
+                let val3 = null;
+
+                // แปลงค่าเป็นตัวเลข และเช็กว่าเป็นตัวเลขที่ถูกต้องจริงๆ (ไม่เป็น NaN)
+                // parseFloat จะเปลี่ยน "00066" เป็น 66 ให้เราอัตโนมัติ
+                const numVal = parseFloat(item.reading_value);
+                
+                if (!isNaN(numVal)) { // ถ้าเป็นตัวเลขที่ถูกต้อง
+                     if (item.house_id == 1) val1 = numVal;
+                     if (item.house_id == 2) val2 = numVal;
+                     if (item.house_id == 3) val3 = numVal;
+                }
+
+                // เพิ่มแถวข้อมูลลงใน DataTable
+                data.addRow([timeLabel, val1, val2, val3]);
+            });
+
+            const options = {
+                title: 'แนวโน้มการใช้ไฟฟ้า (หน่วย)',
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                hAxis: { title: 'เวลา' },
+                vAxis: { title: 'หน่วยมิเตอร์' },
+                pointSize: 5,
+                series: {
+                    0: { color: '#0d6efd' }, // บ้าน 1
+                    1: { color: '#198754' }, // บ้าน 2
+                    2: { color: '#dc3545' }  // บ้าน 3
+                }
+            };
+
+            const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+
+        // --- ส่วนดึงข้อมูล (เหมือนเดิม แต่เพิ่มการเรียกวาดกราฟ) ---
+        async function fetchReadings() {
+            try {
+                const response = await fetch('http://localhost:3000/api/readings');
+                rawData = await response.json(); // เก็บข้อมูลลงตัวแปรกลาง
+                updateTable(rawData);
+                drawChart(); // วาดกราฟหลังจากได้ข้อมูล
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function updateTable(readings) {
+            const tableBody = document.querySelector('#readingsTable tbody');
+            tableBody.innerHTML = '';
+            readings.forEach(reading => {
+                const row = document.createElement('tr');
+                const date = new Date(reading.reading_time).toLocaleString('th-TH');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td><span class="badge bg-info text-dark">${reading.house_name}</span></td>
+                    <td class="fw-bold text-success" style="font-size: 1.2em;">${reading.reading_value || '-'}</td>
+                    <td>
+                        <a href="http://localhost:3000/uploads/${reading.image_filename}" target="_blank">
+                            <img src="http://localhost:3000/uploads/cropped-${reading.image_filename}" 
+                                 class="meter-img" alt="Meter"
+                                 onerror="this.onerror=null;this.src='http://localhost:3000/uploads/${reading.image_filename}';">
+                        </a>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // รีเฟรชหน้าจออัตโนมัติทุก 1 นาทีเพื่อให้กราฟเป็นปัจจุบันเสมอ
+        setInterval(fetchReadings, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+บรรณานุกรม
+IOT : https://aws.amazon.com/th/what-is/iot/
