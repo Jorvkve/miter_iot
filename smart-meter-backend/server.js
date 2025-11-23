@@ -94,7 +94,8 @@ async function cropImage(inputPath, outputPath, cropOptions) {
     }
 }
 
-// --- ปรับปรุง API upload ให้ทำ Cropping และ OCR ---
+// --- แก้ไขเฉพาะส่วน app.post('/api/upload', ...) ---
+
 app.post('/api/upload', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'กรุณาอัปโหลดไฟล์ภาพ' });
@@ -103,80 +104,77 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         const originalFilename = req.file.filename;
         const originalImagePath = path.join(__dirname, 'uploads', originalFilename);
 
-        // --- ใหม่: กำหนดพิกัดสำหรับ Crop ---
-        // ค่าเหล่านี้อาจต้องปรับจูนจากภาพจริงที่ ESP32-CAM ส่งมา
-        const cropCoordinates = {
-            left: 319,  // X-coordinate จากซ้ายสุด
-            top: 236,   // Y-coordinate จากบนสุด
-            width: 318, // ความกว้างของพื้นที่ที่ต้องการ
-            height: 116  // ความสูงของพื้นที่ที่ต้องการ
+        console.log(`📥 ได้รับภาพ: ${originalFilename}`);
+
+        // --- 1. เช็กขนาดภาพก่อนตัด ---
+        const metadata = await sharp(originalImagePath).metadata();
+        console.log(`📏 ขนาดภาพจริง: ${metadata.width} x ${metadata.height}`);
+
+        // กำหนดพิกัด Crop ที่ต้องการ (ค่าเดิมของเรา)
+        const targetCrop = {
+            left: 310,
+            top: 190,
+            width: 360,
+            height: 90
         };
 
-        // สร้างชื่อไฟล์สำหรับรูปที่ถูก Crop
-        const croppedFilename = `cropped-${originalFilename}`;
-        const croppedImagePath = path.join(__dirname, 'uploads', croppedFilename);
+        let finalImagePath = originalImagePath; // เริ่มต้นใช้ภาพเดิม
+        let isCropped = false;
 
-        console.log(`กำลังตัดภาพ ${originalFilename} ...`);
+        // เช็กว่าตัดได้ไหม? (ภาพต้องใหญ่กว่าพื้นที่ที่จะตัด)
+        if (metadata.width >= (targetCrop.left + targetCrop.width) && 
+            metadata.height >= (targetCrop.top + targetCrop.height)) {
+            
+            // ถ้าภาพใหญ่พอ -> ให้ทำการ Crop
+            const croppedFilename = `cropped-${originalFilename}`;
+            const croppedImagePath = path.join(__dirname, 'uploads', croppedFilename);
+            
+            await cropImage(originalImagePath, croppedImagePath, targetCrop);
+            finalImagePath = croppedImagePath; // เปลี่ยนไปใช้ภาพที่ตัดแล้ว
+            isCropped = true;
+            console.log("✂️ ตัดภาพสำเร็จ!");
 
-        // --- ทำการ Crop ภาพ ---
-        await cropImage(originalImagePath, croppedImagePath, cropCoordinates);
+        } else {
+            // ถ้าภาพเล็กเกินไป -> ข้ามการ Crop
+            console.warn("⚠️ ภาพเล็กเกินไปสำหรับการ Crop (ข้ามขั้นตอนการตัดภาพ)");
+            // หมายเหตุ: ถ้าไม่ Crop เราอาจจะอ่าน OCR ไม่ได้แม่นยำ แต่ระบบจะไม่พัง
+        }
 
-        console.log(`กำลังเริ่มทำ OCR กับไฟล์ที่ตัดแล้ว: ${croppedFilename} ...`);
-
-        // --- เริ่มกระบวนการ OCR กับภาพที่ถูกตัดแล้ว ---
+        // --- 2. ทำ OCR (กับภาพ Final) ---
+        console.log(`📖 กำลังอ่านค่า OCR จากไฟล์: ${isCropped ? 'ภาพที่ตัดแล้ว' : 'ภาพต้นฉบับ'} ...`);
+        
         const { data: { text } } = await Tesseract.recognize(
-            croppedImagePath, // ใช้ภาพที่ถูกตัดแล้ว
+            finalImagePath,
             'eng',
-            { logger: m => console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`) }
+            { logger: m => {} } // ปิด log รกๆ
         );
 
-        console.log('--- ข้อความดิบที่อ่านได้จาก Tesseract (จากภาพที่ตัดแล้ว) ---');
-        console.log(text);
-        console.log('--------------------------------------');
+        console.log(`📝 ข้อความดิบ: ${text.trim()}`);
+        let readingValue = extractNumberFromText(text); // แปลงเป็น "00066" หรือ null
 
-        // แปลงข้อความดิบ ให้เป็นตัวเลขที่เราต้องการ
-        let readingValue = extractNumberFromText(text);
-
-        if (readingValue === null) {
-             console.warn('⚠️ คำเตือน: ไม่สามารถดึงตัวเลขจากภาพที่ตัดแล้วได้, บันทึกเป็น NULL');
-             // คุณอาจจะเพิ่มการตรวจสอบอีกครั้ง หรือใช้ค่า default 0
-        }
-        
-        // --- (Optional) ลบไฟล์ภาพที่ถูก Crop เพื่อประหยัดพื้นที่ ---
-        // fs.unlinkSync(croppedImagePath);
-
-
-        // บันทึกลง Database
+        // --- 3. บันทึกลง Database ---
         const sql = 'INSERT INTO meter_readings (house_id, reading_value, image_filename) VALUES (?, ?, ?)';
         db.query(sql, [houseId, readingValue, originalFilename], (err, result) => {
             if (err) {
                 console.error('Database Error:', err);
-                // ถ้ามี error ในการบันทึกลง DB อาจจะต้องลบไฟล์ original ทิ้งด้วย
-                // fs.unlinkSync(originalImagePath);
-                return res.status(500).json({ error: 'บันทึกลงฐานข้อมูลไม่สำเร็จ' });
+                return res.status(500).json({ error: 'Database Insert Failed' });
             }
 
-            console.log(`✅ บันทึกสำเร็จ! House: ${houseId}, Value: ${readingValue}`);
+            console.log(`✅ บันทึกสำเร็จ! ID: ${result.insertId}`);
             res.json({
-                message: 'อัปโหลด ตัดภาพ และอ่านค่ามิเตอร์สำเร็จ!',
+                message: 'บันทึกข้อมูลสำเร็จ',
                 data: {
                     id: result.insertId,
-                    house_id: houseId,
-                    reading_raw_text: text,
-                    reading_value: readingValue,
-                    original_filename: originalFilename,
-                    cropped_filename: croppedFilename // ส่งชื่อไฟล์ที่ถูกตัดกลับไปด้วย
+                    value: readingValue,
+                    original_size: `${metadata.width}x${metadata.height}`,
+                    cropped: isCropped
                 }
             });
         });
 
     } catch (error) {
-        console.error('Server Error:', error);
-        // ในกรณีมีข้อผิดพลาดร้ายแรง ควรลบไฟล์ภาพที่อัปโหลดมาทิ้ง
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์' });
+        console.error('🔥 Server Error:', error); // ดู Error เต็มๆ ที่นี่
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์: ' + error.message });
     }
 });
 
