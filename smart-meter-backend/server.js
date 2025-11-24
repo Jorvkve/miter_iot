@@ -112,10 +112,10 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 
         // กำหนดพิกัด Crop ที่ต้องการ (ค่าเดิมของเรา)
         const targetCrop = {
-            left: 310,
-            top: 190,
-            width: 360,
-            height: 90
+            left: 650,
+            top: 400,
+            width: 500,
+            height: 150
         };
 
         let finalImagePath = originalImagePath; // เริ่มต้นใช้ภาพเดิม
