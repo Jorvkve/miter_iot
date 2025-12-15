@@ -5,11 +5,11 @@
 #define SIM800_RX_PIN 13 // ต่อกับ TX ของ SIM800L
 #define SIM800_TX_PIN 14 // ต่อกับ RX ของ SIM800L
 
-// --- 2. ตั้งค่า Server (⚠️ ต้องแก้ตรงนี้!) ---
-// วิธีหา IP: เปิด cmd ในคอม -> พิมพ์ ipconfig -> ดู IPv4 Address
-String serverUrl = "http://192.168.1.126:3000/api/upload"; // <--- แก้เลขนี้ให้ตรงกับคอมคุณ
+// --- 2. ตั้งค่า Server (⚠️ แก้ IP ตรงนี้ให้ตรงกับเครื่องคอมฯ ของคุณ) ---
+// วิธีหา IP: เปิด cmd -> พิมพ์ ipconfig -> ดู IPv4
+String serverUrl = "http://44096080e839.ngrok-free.app/api/upload"; 
 
-// ตั้งค่า APN (AIS, True, Dtac ส่วนใหญ่ใช้คำว่า internet ได้เลย)
+// ตั้งค่า APN (ซิม True/AIS ใช้คำว่า internet ได้เลย)
 String apn = "internet"; 
 
 HardwareSerial sim800(1);
@@ -34,7 +34,7 @@ HardwareSerial sim800(1);
 
 void setup() {
   Serial.begin(115200);
-  // เริ่มต้น SIM800L ที่ Baud rate 9600 (มาตรฐาน)
+  // เริ่มต้น SIM800L (ถ้าบอร์ดคุณใช้ 115200 ให้แก้ตรงนี้)
   sim800.begin(9600, SERIAL_8N1, SIM800_RX_PIN, SIM800_TX_PIN);
   delay(1000);
 
@@ -65,8 +65,8 @@ void setup() {
   config.pixel_format = PIXFORMAT_JPEG;
 
   if(psramFound()){
-    config.frame_size = FRAMESIZE_SVGA; // ใช้ขนาด SVGA (800x600) กำลังดี ส่งไม่ช้าเกินไป
-    config.jpeg_quality = 12;           // คุณภาพ (10-63) ยิ่งน้อยยิ่งชัด
+    config.frame_size = FRAMESIZE_SVGA; // 800x600 (ขนาดกำลังดี ส่งไว)
+    config.jpeg_quality = 12;           // 10-63 (ยิ่งน้อยยิ่งชัด)
     config.fb_count = 1;
   } else {
     config.frame_size = FRAMESIZE_VGA;
@@ -81,14 +81,15 @@ void setup() {
   }
   Serial.println("Camera Ready! 📷");
 
-  // 2. เริ่มต้นเชื่อมต่อเน็ต
+  // 2. เริ่มต้นเชื่อมต่อเน็ต (แบบรอจนกว่าจะพร้อม)
   initGPRS();
 }
 
 void loop() {
-  // ทำงานทุกๆ 60 วินาที (เปลี่ยนตัวเลขได้)
+  // ทำงานทุกๆ 60 วินาที
   Serial.println("\n--- Taking Photo ---");
   
+  // ถ่ายรูป
   camera_fb_t * fb = esp_camera_fb_get();
   if(!fb) {
     Serial.println("Camera capture failed");
@@ -98,7 +99,7 @@ void loop() {
   
   Serial.printf("Picture taken! Size: %d bytes\n", fb->len);
   
-  // ส่งรูปภาพขึ้น Server
+  // ส่งรูปภาพ
   sendImageToBackend(fb);
   
   esp_camera_fb_return(fb); // คืนหน่วยความจำ
@@ -122,63 +123,105 @@ String sendAT(String command, const int timeout, boolean debug) {
   return response;
 }
 
-// --- ฟังก์ชันเชื่อมต่อ GPRS ---
+// --- ฟังก์ชันเชื่อมต่อ GPRS (ฉบับอัปเกรด: รอจนกว่าจะพร้อม) ---
 void initGPRS() {
   Serial.println("Initializing SIM800L...");
   sendAT("AT", 1000, true);
-  sendAT("AT+CPIN?", 1000, true); // เช็กซิม
-  sendAT("AT+CSQ", 1000, true);   // เช็กสัญญาณ
+  
+  // 1. วนลูปรอจนกว่าจะอ่านซิมเจอ (READY)
+  Serial.print("Checking SIM Card...");
+  while(true) {
+    String resp = sendAT("AT+CPIN?", 1000, false);
+    if(resp.indexOf("READY") != -1) {
+      Serial.println(" OK! ✅");
+      break;
+    }
+    Serial.print(".");
+    delay(1000);
+  }
 
+  // 2. วนลูปรอสัญญาณเครือข่าย (CREG: 0,1 หรือ 0,5)
+  Serial.print("Waiting for Network...");
+  while(true) {
+    String resp = sendAT("AT+CREG?", 1000, false);
+    if(resp.indexOf("0,1") != -1 || resp.indexOf("0,5") != -1) {
+      Serial.println(" Connected! ✅");
+      break;
+    }
+    Serial.print(".");
+    delay(2000);
+  }
+
+  // 3. เช็กความแรงสัญญาณ
+  sendAT("AT+CSQ", 1000, true);
+
+  // 4. เชื่อมต่อเน็ต GPRS
   Serial.println("Connecting to GPRS...");
   sendAT("AT+SAPBR=3,1,\"Contype\",\"GPRS\"", 1000, true);
   sendAT("AT+SAPBR=3,1,\"APN\",\"" + apn + "\"", 1000, true);
-  sendAT("AT+SAPBR=1,1", 5000, true); // เปิดเน็ต (รอนานหน่อย 5วิ)
-  sendAT("AT+SAPBR=2,1", 2000, true); // เช็ก IP ที่ได้มา
+  
+  // ลองต่อเน็ต 3 รอบ (กันพลาด)
+  for(int i=0; i<3; i++) {
+    sendAT("AT+SAPBR=1,1", 5000, true); // สั่งเปิดเน็ต
+    String ip = sendAT("AT+SAPBR=2,1", 2000, true); // ขอ IP
+    if(ip.indexOf("\"0.0.0.0\"") == -1 && ip.indexOf("ERROR") == -1) {
+       Serial.println("✅ GPRS Online! IP Obtained.");
+       return;
+    }
+    Serial.println("Retrying GPRS connection...");
+    delay(2000);
+  }
 }
 
 // --- ฟังก์ชันส่งรูป (Multipart POST) ---
 void sendImageToBackend(camera_fb_t * fb) {
   Serial.println("Starting Upload...");
   
-  // เริ่ม HTTP
+  // เริ่ม HTTP Session
   sendAT("AT+HTTPINIT", 1000, true);
   sendAT("AT+HTTPPARA=\"CID\",1", 1000, true);
   sendAT("AT+HTTPPARA=\"URL\",\"" + serverUrl + "\"", 1000, true);
-  
-  // ตั้งค่า Content-Type เป็น Multipart
   sendAT("AT+HTTPPARA=\"CONTENT\",\"multipart/form-data; boundary=myboundary\"", 1000, true);
+  // เพิ่มบรรทัดนี้ลงไป เพื่อทะลุหน้า Warning ของ Ngrok
+  sendAT("AT+HTTPPARA=\"USERDATA\",\"ngrok-skip-browser-warning: true\"", 1000, true);
 
-  // สร้าง Header และ Footer
+  // สร้าง Header/Footer
   String head = "--myboundary\r\nContent-Disposition: form-data; name=\"image\"; filename=\"meter.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
   String tail = "\r\n--myboundary--\r\n";
 
   // คำนวณขนาด
   uint32_t totalLen = head.length() + fb->len + tail.length();
   
-  // แจ้งขนาดข้อมูลที่จะส่ง
   Serial.printf("Total payload size: %d bytes\n", totalLen);
-  // สั่ง HTTPDATA (ให้เวลา 30 วินาทีในการส่งข้อมูลเข้าโมดูล)
-  sim800.print("AT+HTTPDATA=" + String(totalLen) + ",30000\r\n"); 
+  // สั่ง HTTPDATA (ให้เวลา 60 วิในการส่งข้อมูล)
+  sim800.print("AT+HTTPDATA=" + String(totalLen) + ",60000\r\n"); 
   
   delay(1000); // รอคำว่า DOWNLOAD
   
-  // ส่งข้อมูลดิบ
+  // ส่งข้อมูล
   Serial.println("Writing Data...");
   sim800.print(head);                 
-  sim800.write(fb->buf, fb->len);     
+  // เขียนข้อมูลทีละนิด (ป้องกัน Buffer เต็ม)
+  int chunkSize = 1024; // ส่งทีละ 1KB
+  for (size_t i = 0; i < fb->len; i += chunkSize) {
+    size_t len = (i + chunkSize < fb->len) ? chunkSize : (fb->len - i);
+    sim800.write(fb->buf + i, len);
+    // delay(10); // ถ้าส่งเร็วไปให้เปิดบรรทัดนี้
+  }
+   
   sim800.print(tail);                 
 
   delay(1000);
 
   // สั่ง POST (Action 1)
   Serial.println("POST Action...");
-  String response = sendAT("AT+HTTPACTION=1", 20000, true); // รอนานๆ เลยเผื่อเน็ตช้า
+  String response = sendAT("AT+HTTPACTION=1", 20000, true); // รอนานๆ เผื่อเน็ตช้า
 
   if (response.indexOf("+HTTPACTION: 1,200") != -1) {
     Serial.println("\n✅ Upload Success! (Status 200)");
   } else {
     Serial.println("\n❌ Upload Failed!");
-    sendAT("AT+HTTPREAD", 2000, true); // อ่าน Error ดู
+    sendAT("AT+HTTPREAD", 2000, true); // อ่าน Error
   }
 
   sendAT("AT+HTTPTERM", 1000, true);
