@@ -4,24 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Meter Dashboard</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .card { margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .meter-img { max-width: 100px; height: auto; border-radius: 5px; cursor: pointer; }
-    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
     <div class="container py-5">
-        <h1 class="mb-4 text-center">⚡ Dashboard มิเตอร์ไฟฟ้าอัจฉริยะ</h1>
+        <h1 class="text-center"><i class="fas fa-bolt text-warning"></i> IOT-BASED ELECTRICITY METER MONITORING SYSTEM</h1>
+        <p class="text-center text-muted mb-5">ระบบติดตามการใช้ไฟฟ้าผ่านมิเตอร์ไฟฟ้า IoT</p>
 
         <div class="row mb-4">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">กราฟแสดงการใช้ไฟฟ้าล่าสุด</h5>
-                        <div id="chart_div" style="height: 300px;">
-                            <p class="text-muted text-center py-5">กำลังโหลดข้อมูลกราฟ...</p>
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2"></i> กราฟแสดงการใช้ไฟฟ้าล่าสุด
+                    </div>
+                    <div class="card-body p-0"> <div id="chart_div" style="height: 350px; width: 100%;">
+                            <div class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                <span><i class="fas fa-spinner fa-spin me-2"></i> กำลังโหลดข้อมูล...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -29,18 +33,18 @@
         </div>
 
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">รายการอ่านค่าล่าสุด</h5>
+            <div class="card-header">
+                <i class="fas fa-list-ul me-2"></i> รายการอ่านค่าล่าสุด
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle" id="readingsTable">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0" id="readingsTable">
+                        <thead>
                             <tr>
-                                <th>เวลาที่บันทึก</th>
-                                <th>บ้าน</th>
-                                <th>ค่ามิเตอร์ (หน่วย)</th>
-                                <th>รูปภาพ</th>
+                                <th class="ps-4"><i class="far fa-clock me-1"></i> เวลาที่บันทึก</th>
+                                <th><i class="fas fa-home me-1"></i> บ้าน</th>
+                                <th><i class="fas fa-tachometer-alt me-1"></i> ค่ามิเตอร์ (หน่วย)</th>
+                                <th><i class="far fa-image me-1"></i> หลักฐาน</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -50,19 +54,18 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
         // --- ส่วน Google Charts ---
         google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(fetchReadings); // โหลดเสร็จแล้วค่อยไปดึงข้อมูล
+        google.charts.setOnLoadCallback(fetchReadings);
 
-        let rawData = []; // ตัวแปรเก็บข้อมูลดิบไว้ใช้ทั้งในตารางและกราฟ
+        let rawData = [];
 
         function drawChart() {
             if (rawData.length === 0) return;
 
-            // 1. สร้าง DataTable แบบกำหนดชนิดข้อมูลชัดเจน (วิธีนี้แก้ปัญหา Type มั่วได้ชะงัดนัก)
             const data = new google.visualization.DataTable();
             data.addColumn('string', 'Time');
             data.addColumn('number', 'House 1');
@@ -73,52 +76,51 @@
 
             reversedData.forEach(item => {
                 const time = new Date(item.reading_time);
-                const timeLabel = time.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                const timeLabel = time.toLocaleString('th-TH', { 
+                    year: '2-digit',  // ✅ เติมปี (แบบย่อ 2 หลัก) เข้าไปแล้วครับ
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
 
-                // เตรียมตัวแปรเก็บค่า (เริ่มต้นเป็น null คือไม่มีข้อมูล)
-                let val1 = null;
-                let val2 = null;
-                let val3 = null;
-
-                // แปลงค่าเป็นตัวเลข และเช็กว่าเป็นตัวเลขที่ถูกต้องจริงๆ (ไม่เป็น NaN)
-                // parseFloat จะเปลี่ยน "00066" เป็น 66 ให้เราอัตโนมัติ
+                let val1 = null, val2 = null, val3 = null;
                 const numVal = parseFloat(item.reading_value);
                 
-                if (!isNaN(numVal)) { // ถ้าเป็นตัวเลขที่ถูกต้อง
+                if (!isNaN(numVal)) {
                      if (item.house_id == 1) val1 = numVal;
                      if (item.house_id == 2) val2 = numVal;
                      if (item.house_id == 3) val3 = numVal;
                 }
-
-                // เพิ่มแถวข้อมูลลงใน DataTable
                 data.addRow([timeLabel, val1, val2, val3]);
             });
 
             const options = {
-                title: 'แนวโน้มการใช้ไฟฟ้า (หน่วย)',
+                title: '', // ลบ Title ในกราฟออกเพราะมีที่ Header การ์ดแล้ว
                 curveType: 'function',
                 legend: { position: 'bottom' },
-                hAxis: { title: 'เวลา' },
-                vAxis: { title: 'หน่วยมิเตอร์' },
-                pointSize: 5,
+                chartArea: { width: '90%', height: '80%' }, // ขยายพื้นที่กราฟ
+                hAxis: { textStyle: { color: '#666' } },
+                vAxis: { textStyle: { color: '#666' }, gridlines: { color: '#eee' } },
                 series: {
-                    0: { color: '#0d6efd' }, // บ้าน 1
-                    1: { color: '#198754' }, // บ้าน 2
-                    2: { color: '#dc3545' }  // บ้าน 3
-                }
+                    0: { color: '#0d6efd' },
+                    1: { color: '#198754' },
+                    2: { color: '#dc3545' }
+                },
+                backgroundColor: 'transparent'
             };
 
             const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
 
-        // --- ส่วนดึงข้อมูล (เหมือนเดิม แต่เพิ่มการเรียกวาดกราฟ) ---
         async function fetchReadings() {
             try {
+                // ⚠️ อย่าลืมเปลี่ยน URL ให้ตรงกับ Server จริงของคุณ
                 const response = await fetch('http://localhost:3000/api/readings');
-                rawData = await response.json(); // เก็บข้อมูลลงตัวแปรกลาง
+                rawData = await response.json();
                 updateTable(rawData);
-                drawChart(); // วาดกราฟหลังจากได้ข้อมูล
+                drawChart();
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -127,18 +129,31 @@
         function updateTable(readings) {
             const tableBody = document.querySelector('#readingsTable tbody');
             tableBody.innerHTML = '';
+            
+            if(readings.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+
             readings.forEach(reading => {
                 const row = document.createElement('tr');
                 const date = new Date(reading.reading_time).toLocaleString('th-TH');
+                
+                // กำหนดสี Badge ตามบ้าน
+                let badgeColor = 'bg-secondary';
+                if(reading.house_id == 1) badgeColor = 'bg-primary';
+                else if(reading.house_id == 2) badgeColor = 'bg-success';
+                else if(reading.house_id == 3) badgeColor = 'bg-danger';
+
                 row.innerHTML = `
-                    <td>${date}</td>
-                    <td><span class="badge bg-info text-dark">${reading.house_name}</span></td>
-                    <td class="fw-bold text-success" style="font-size: 1.2em;">${reading.reading_value || '-'}</td>
+                    <td class="ps-4 text-secondary fw-bold">${date}</td>
+                    <td><span class="badge ${badgeColor} badge-house">${reading.house_name || 'House ' + reading.house_id}</span></td>
+                    <td><span class="meter-value">${reading.reading_value || '-'}</span></td>
                     <td>
                         <a href="http://localhost:3000/uploads/${reading.image_filename}" target="_blank">
                             <img src="http://localhost:3000/uploads/cropped-${reading.image_filename}" 
-                                 class="meter-img" alt="Meter"
-                                 onerror="this.onerror=null;this.src='http://localhost:3000/uploads/${reading.image_filename}';">
+                                 class="meter-img" alt="Meter Image"
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/100x60?text=No+Image';">
                         </a>
                     </td>
                 `;
@@ -146,7 +161,6 @@
             });
         }
 
-        // รีเฟรชหน้าจออัตโนมัติทุก 1 นาทีเพื่อให้กราฟเป็นปัจจุบันเสมอ
         setInterval(fetchReadings, 60000);
     </script>
 </body>
