@@ -98,18 +98,16 @@ async function cropImage(inputPath, outputPath, cropOptions) {
         await sharp(inputPath)
             .extract(cropOptions)
             .resize({ 
-                width: cropOptions.width * 2, // กลับมาใช้ 2 เท่า (เส้นจะคมกว่า 3 เท่า)
+                width: cropOptions.width * 2, // ขยาย 2 เท่า
                 kernel: sharp.kernel.lanczos3 
             })
-            .grayscale()
-            .normalise() // ปรับแสงให้สมดุล
-            .sharpen()   // เร่งความคม
-            .extend({    // 🔥 ทีเด็ด! เติมขอบสีขาวรอบภาพ 10px เพื่อไม่ให้เลข 6 ชิดขอบ
-                top: 10,
-                bottom: 10,
-                left: 10,
-                right: 10,
-                background: { r: 255, g: 255, b: 255 } // สีขาว
+            .grayscale()    // ทำเป็นขาวดำ
+            .threshold(140) // 🔥 สำคัญมาก: ตัดสีเทาทิ้งให้เหลือแค่ ขาว/ดำ (เหมาะกับถ่ายตัวเลข)
+            .normalise()
+            .sharpen()
+            .extend({       // เติมขอบขาว
+                top: 10, bottom: 10, left: 10, right: 10,
+                background: { r: 255, g: 255, b: 255 }
             })
             .toFile(outputPath);
         
@@ -118,7 +116,7 @@ async function cropImage(inputPath, outputPath, cropOptions) {
 
     } catch (error) {
         console.error('🔥 เกิดข้อผิดพลาดรุนแรงในการตัดภาพ:', error);
-        throw error; // ส่ง error กลับไปให้ฟังก์ชันหลักรับรู้
+        throw error;
     }
 }
 
@@ -134,42 +132,40 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 
         console.log(`📥 ได้รับภาพ: ${originalFilename}`);
 
-        // --- 1. เช็กขนาดภาพก่อนตัด ---
+        // --- 1. เช็กขนาดภาพ ---
         const metadata = await sharp(originalImagePath).metadata();
         console.log(`📏 ขนาดภาพจริง: ${metadata.width} x ${metadata.height}`);
 
-        // กำหนดพิกัด Crop ที่ต้องการ (ค่าเดิมของเรา)
+        // 🔥 ใช้ค่าพิกัดที่คุณหามา (Fixed Crop) แม่นยำที่สุดสำหรับ Demo
         const targetCrop = {
-            left: 438,
-            top: 199,
-            width: 460, // 🔺 เพิ่มจาก 420 กลับมาเป็น 460 (ให้เห็นเลข 6 เต็มตัว)
-            height: 134
+            left: 177,  // Position X
+            top: 337,   // Position Y
+            width: 436, // Width
+            height: 122 // Height
         };
 
-        let finalImagePath = originalImagePath; // เริ่มต้นใช้ภาพเดิม
+        let finalImagePath = originalImagePath;
         let isCropped = false;
 
-        // เช็กว่าตัดได้ไหม? (ภาพต้องใหญ่กว่าพื้นที่ที่จะตัด)
+        // เช็กว่าตัดได้ไหม (กัน Error กรณีภาพมาเล็กกว่าที่ตั้งไว้)
         if (metadata.width >= (targetCrop.left + targetCrop.width) && 
             metadata.height >= (targetCrop.top + targetCrop.height)) {
             
-            // ถ้าภาพใหญ่พอ -> ให้ทำการ Crop
             const croppedFilename = `cropped-${originalFilename}`;
             const croppedImagePath = path.join(__dirname, 'uploads', croppedFilename);
             
+            // เรียกฟังก์ชันตัดภาพ
             await cropImage(originalImagePath, croppedImagePath, targetCrop);
-            finalImagePath = croppedImagePath; // เปลี่ยนไปใช้ภาพที่ตัดแล้ว
+            finalImagePath = croppedImagePath;
             isCropped = true;
-            console.log("✂️ ตัดภาพสำเร็จ!");
+            console.log("✂️ ตัดภาพสำเร็จ! (Manual Coordinates)");
 
         } else {
-            // ถ้าภาพเล็กเกินไป -> ข้ามการ Crop
             console.warn("⚠️ ภาพเล็กเกินไปสำหรับการ Crop (ข้ามขั้นตอนการตัดภาพ)");
-            // หมายเหตุ: ถ้าไม่ Crop เราอาจจะอ่าน OCR ไม่ได้แม่นยำ แต่ระบบจะไม่พัง
         }
 
-        // --- 2. ทำ OCR (กับภาพ Final) ---
-        console.log(`📖 กำลังอ่านค่า OCR จากไฟล์: ${isCropped ? 'ภาพที่ตัดแล้ว' : 'ภาพต้นฉบับ'} ...`);
+        // --- 2. ทำ OCR ---
+        console.log(`📖 กำลังอ่านค่า OCR...`);
         
         const { data: { text } } = await Tesseract.recognize(
             finalImagePath,
@@ -177,14 +173,24 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
             { 
                 logger: m => {},
                 tessedit_char_whitelist: '0123456789', // อ่านเฉพาะตัวเลข
-                tessedit_pageseg_mode: '7' // 🔥 ทีเด็ด: บอกว่า "นี่คือข้อความบรรทัดเดียว" (Single Line)
+                tessedit_pageseg_mode: '7' // โหมดบรรทัดเดียว
             }
         )
 
         console.log(`📝 ข้อความดิบ: ${text.trim()}`);
-        let readingValue = extractNumberFromText(text); // แปลงเป็น "00066" หรือ null
+        let readingValue = extractNumberFromText(text); 
 
-        // --- 3. บันทึกลง Database ---
+        // --- 3. ดักจับค่าขยะ (Validation) ---
+        // ถ้าค่าว่าง หรือ ยาวเกิน 7 หลัก หรือ สั้นกว่า 3 หลัก -> ไม่บันทึก
+        if (!readingValue || readingValue.length > 7 || readingValue.length < 3) {
+            console.log(`❌ ค่าผิดปกติ: "${readingValue}" (Noise/ขยะ) -> ไม่บันทึก`);
+            return res.status(400).json({ 
+                error: 'Bad Reading', 
+                reason: 'ค่าที่อ่านได้ผิดปกติ (Noise)' 
+            });
+        }
+
+        // --- 4. บันทึกลง Database (ถ้าผ่าน) ---
         const sql = 'INSERT INTO meter_readings (house_id, reading_value, image_filename) VALUES (?, ?, ?)';
         db.query(sql, [houseId, readingValue, originalFilename], (err, result) => {
             if (err) {
@@ -192,21 +198,20 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
                 return res.status(500).json({ error: 'Database Insert Failed' });
             }
 
-            console.log(`✅ บันทึกสำเร็จ! ID: ${result.insertId}`);
+            console.log(`✅ บันทึกสำเร็จ! ID: ${result.insertId} | ค่าที่ได้: ${readingValue}`);
             res.json({
                 message: 'บันทึกข้อมูลสำเร็จ',
                 data: {
                     id: result.insertId,
                     value: readingValue,
-                    original_size: `${metadata.width}x${metadata.height}`,
                     cropped: isCropped
                 }
             });
         });
 
     } catch (error) {
-        console.error('🔥 Server Error:', error); // ดู Error เต็มๆ ที่นี่
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์: ' + error.message });
+        console.error('🔥 Server Error:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
