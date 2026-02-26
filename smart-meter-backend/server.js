@@ -154,7 +154,6 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
 
     console.log(`📥 ได้รับภาพ: ${originalFilename}`);
 
-<<<<<<< HEAD
     // --- 1. เช็กขนาดภาพก่อนตัด ---
     const metadata = await sharp(originalImagePath).metadata();
     console.log(`📏 ขนาดภาพจริง: ${metadata.width} x ${metadata.height}`);
@@ -200,88 +199,6 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
       if (match) {
         readingValue = match[0];
       }
-=======
-        // --- 1. เช็กขนาดภาพ ---
-        const metadata = await sharp(originalImagePath).metadata();
-        console.log(`📏 ขนาดภาพจริง: ${metadata.width} x ${metadata.height}`);
-
-        // 🔥 ใช้ค่าพิกัดที่คุณหามา (Fixed Crop) แม่นยำที่สุดสำหรับ Demo
-        const targetCrop = {
-            left: 177,  // Position X
-            top: 337,   // Position Y
-            width: 436, // Width
-            height: 122 // Height
-        };
-
-        let finalImagePath = originalImagePath;
-        let isCropped = false;
-
-        // เช็กว่าตัดได้ไหม (กัน Error กรณีภาพมาเล็กกว่าที่ตั้งไว้)
-        if (metadata.width >= (targetCrop.left + targetCrop.width) && 
-            metadata.height >= (targetCrop.top + targetCrop.height)) {
-            
-            const croppedFilename = `cropped-${originalFilename}`;
-            const croppedImagePath = path.join(__dirname, 'uploads', croppedFilename);
-            
-            // เรียกฟังก์ชันตัดภาพ
-            await cropImage(originalImagePath, croppedImagePath, targetCrop);
-            finalImagePath = croppedImagePath;
-            isCropped = true;
-            console.log("✂️ ตัดภาพสำเร็จ! (Manual Coordinates)");
-
-        } else {
-            console.warn("⚠️ ภาพเล็กเกินไปสำหรับการ Crop (ข้ามขั้นตอนการตัดภาพ)");
-        }
-
-        // --- 2. ทำ OCR ---
-        console.log(`📖 กำลังอ่านค่า OCR...`);
-        
-        const { data: { text } } = await Tesseract.recognize(
-            finalImagePath,
-            'eng',
-            { 
-                logger: m => {},
-                tessedit_char_whitelist: '0123456789', // อ่านเฉพาะตัวเลข
-                tessedit_pageseg_mode: '7' // โหมดบรรทัดเดียว
-            }
-        )
-
-        console.log(`📝 ข้อความดิบ: ${text.trim()}`);
-        let readingValue = extractNumberFromText(text); 
-
-        // --- 3. ดักจับค่าขยะ (Validation) ---
-        // ถ้าค่าว่าง หรือ ยาวเกิน 7 หลัก หรือ สั้นกว่า 3 หลัก -> ไม่บันทึก
-        if (!readingValue || readingValue.length > 7 || readingValue.length < 3) {
-            console.log(`❌ ค่าผิดปกติ: "${readingValue}" (Noise/ขยะ) -> ไม่บันทึก`);
-            return res.status(400).json({ 
-                error: 'Bad Reading', 
-                reason: 'ค่าที่อ่านได้ผิดปกติ (Noise)' 
-            });
-        }
-
-        // --- 4. บันทึกลง Database (ถ้าผ่าน) ---
-        const sql = 'INSERT INTO meter_readings (house_id, reading_value, image_filename) VALUES (?, ?, ?)';
-        db.query(sql, [houseId, readingValue, originalFilename], (err, result) => {
-            if (err) {
-                console.error('Database Error:', err);
-                return res.status(500).json({ error: 'Database Insert Failed' });
-            }
-
-            console.log(`✅ บันทึกสำเร็จ! ID: ${result.insertId} | ค่าที่ได้: ${readingValue}`);
-            res.json({
-                message: 'บันทึกข้อมูลสำเร็จ',
-                data: {
-                    id: result.insertId,
-                    value: readingValue,
-                    cropped: isCropped
-                }
-            });
-        });
-
-    } catch (error) {
-        console.error('🔥 Server Error:', error);
-        res.status(500).json({ error: error.message });
->>>>>>> 1f1165aee9f4fbc92c6f24c16a98c684f0edd2c7
     }
 
     // ถ้ายังไม่ได้ 5 หลัก → ไม่บันทึก
