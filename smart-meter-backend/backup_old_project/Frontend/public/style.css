@@ -1,0 +1,229 @@
+/* style.css */
+
+/* 1. พื้นหลังและฟอนต์หลัก */
+body {
+    background: linear-gradient(135deg, #f6f8fd 0%, #eef2f3 100%); /* ไล่สีพื้นหลังนวลๆ */
+    font-family: 'Segoe UI', 'Sarabun', sans-serif; /* ใช้ฟอนต์ที่อ่านง่าย */
+    color: #333;
+    min-height: 100vh;
+}
+
+/* 2. ปรับแต่งหัวข้อ */
+h1 {
+    color: #2c3e50;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem !important;
+}
+
+/* 3. การ์ด (Card) ให้ดูลอยมีมิติ */
+.card {
+    border: none; /* ลบเส้นขอบเดิม */
+    border-radius: 15px; /* มุมโค้งมน */
+    background: #ffffff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); /* เงาฟุ้งๆ */
+    transition: all 0.3s ease; /* เอฟเฟกต์นุ่มนวลเวลาขยับ */
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* ลอยขึ้นเมื่อเอาเมาส์ชี้ */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(45deg, #0d6efd, #0dcaf0); /* ไล่สีหัวตาราง */
+    color: white;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+
+/* 4. กราฟ */
+#chart_div {
+    border-radius: 0 0 15px 15px;
+}
+
+/* 5. ตาราง (Table) */
+.table thead th {
+    background-color: #f1f4f9;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8faff; /* สีไฮไลท์ตอนชี้แถว */
+}
+
+/* 6. ตัวเลขมิเตอร์ (Digital Look) */
+.meter-value {
+    font-family: 'Courier New', Courier, monospace; /* ฟอนต์แบบเครื่องพิมพ์ดีด */
+    font-weight: 900;
+    color: #198754; /* สีเขียว */
+    font-size: 1.3em;
+    background: #e8f5e9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid #c3e6cb;
+}
+
+/* 7. รูปภาพมิเตอร์ */
+.meter-img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.meter-img:hover {
+    transform: scale(2.5); /* ขยายใหญ่เมื่อชี้ */
+    z-index: 100;
+    position: relative;
+    border-color: #0d6efd;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 8. Badge บ้าน */
+.badge-house {
+    font-size: 0.9em;
+    padding: 0.5em 0.8em;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 9. แท็บ Navigation */
+.nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.nav-tabs .nav-link {
+    color: #666;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    background: transparent;
+}
+
+/* 10. Tab Content */
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 11. สถิติการใช้ไฟฟ้า (Stats Box) */
+.stats-box {
+    background: linear-gradient(135deg, #f5f9ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    padding: 15px;
+    border-left: 4px solid #0d6efd;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
+}
+
+.stat-item:not(:last-child) {
+    border-bottom: 1px solid rgba(13, 110, 253, 0.1);
+    margin-bottom: 8px;
+    padding-bottom: 10px;
+}
+
+.stat-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.stat-value {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 800;
+    color: #0d6efd;
+    font-size: 1.1em;
+}
+
+.stat-item.highlight {
+    background: linear-gradient(135deg, #fff3cd 0%, #fff9e6 100%);
+    border-left: 4px solid #ffc107;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.stat-item.highlight .stat-label {
+    color: #856404;
+}
+
+.stat-item.highlight .stat-value {
+    color: #ff8800;
+}
+
+.house-card {
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.house-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ===== Meter Readings Scroll ===== */
+.readings-scroll {
+  max-height: 420px;   /* ปรับความสูงได้ */
+  overflow-y: auto;
+}
+
+/* scrollbar สวยขึ้น */
+.readings-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.readings-scroll::-webkit-scrollbar-thumb {
+  background: #0d6efd;
+  border-radius: 10px;
+}
+
+.readings-scroll thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}

@@ -1,6 +1,0 @@
-{
-  "_id": "101",
-  "name": "IPhone 15",
-  "price": 32000,
-  "specs": { "ram": "8GB", "color": "Blue" }
-}

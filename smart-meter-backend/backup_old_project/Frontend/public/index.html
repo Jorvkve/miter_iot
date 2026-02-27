@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Meter Dashboard</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container py-5">
+      <h1 class="text-center">
+        <i class="fas fa-bolt text-warning"></i> IOT-BASED ELECTRICITY METER
+        MONITORING SYSTEM
+      </h1>
+      <p class="text-center text-muted mb-5">
+        ระบบติดตามการใช้ไฟฟ้าผ่านมิเตอร์ไฟฟ้า IoT
+      </p>
+
+      <!-- === เลือกแท็บมูลค่า === -->
+      <ul class="nav nav-tabs mb-4" id="chartTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="home-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#realtime"
+            type="button"
+            role="tab"
+          >
+            📊 กราฟรีไทม์
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="monthly-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#monthly"
+            type="button"
+            role="tab"
+          >
+            📈 กราฟรายเดือน
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="admin-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#admin"
+            type="button"
+            role="tab"
+          >
+            ⚙️ Admin
+          </button>
+        </li>
+      </ul>
+
+      <!-- === แท็บกราฟรีไทม์ === -->
+      <div class="tab-content" id="chartTabContent">
+        <div class="tab-pane fade show active" id="realtime" role="tabpanel">
+          <!-- กราฟรวม -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-chart-line me-2"></i> กราฟการใช้ไฟฟ้าทั้งหมด
+                  (รวม 3 บ้าน)
+                </div>
+                <div class="card-body p-0">
+                  <div id="chart_combined" style="height: 350px; width: 100%">
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        กำลังโหลดข้อมูล...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- กราฟแยกบ้าน -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-primary"></i> บ้านที่ 1
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">🆕 มิเตอร์ล่าสุด:</span>
+                      <span class="stat-value" id="house1_latest">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📊 มิเตอร์เก่าสุด:</span>
+                      <span class="stat-value" id="house1_oldest">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">⚡ ใช้ไปทั้งหมด:</span>
+                      <span class="stat-value" id="house1_usage">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div id="chart_house1" style="height: 250px; width: 100%">
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-success"></i> บ้านที่ 2
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">🆕 มิเตอร์ล่าสุด:</span>
+                      <span class="stat-value" id="house2_latest">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📊 มิเตอร์เก่าสุด:</span>
+                      <span class="stat-value" id="house2_oldest">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">⚡ ใช้ไปทั้งหมด:</span>
+                      <span class="stat-value" id="house2_usage">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div id="chart_house2" style="height: 250px; width: 100%">
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-danger"></i> บ้านที่ 3
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">🆕 มิเตอร์ล่าสุด:</span>
+                      <span class="stat-value" id="house3_latest">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📊 มิเตอร์เก่าสุด:</span>
+                      <span class="stat-value" id="house3_oldest">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">⚡ ใช้ไปทั้งหมด:</span>
+                      <span class="stat-value" id="house3_usage">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div id="chart_house3" style="height: 250px; width: 100%">
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-list-ul me-2"></i> รายการอ่านค่าล่าสุด
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive readings-scroll">
+                <table
+                  class="table table-hover align-middle mb-0"
+                  id="readingsTable"
+                >
+                  <thead>
+                    <tr>
+                      <th class="ps-4">
+                        <i class="far fa-clock me-1"></i> เวลาที่บันทึก
+                      </th>
+                      <th><i class="fas fa-home me-1"></i> บ้าน</th>
+                      <th>
+                        <i class="fas fa-tachometer-alt me-1"></i> ค่ามิเตอร์
+                        (หน่วย)
+                      </th>
+                      <th><i class="far fa-image me-1"></i> หลักฐาน</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- === แท็บกราฟรายเดือน === -->
+        <div class="tab-pane fade" id="monthly" role="tabpanel">
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-chart-bar me-2"></i> 
+                  สรุปประจำเดือน (รวม 3บ้าน)
+                </div>
+                <div class="card-body p-0">
+                  <!-- กราฟสรุปรายเดือน -->
+                  <canvas id="monthlyChart" height="120"></canvas>
+                  <!-- กราฟรวมทุกบ้าน -->
+                  <div class="mt-4">
+                    <canvas id="totalUsageChart" height="120"></canvas>
+                  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-primary"></i> บ้านที่ 1
+                  (รายเดือน)
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">📈 มิเตอร์สูงสุด:</span>
+                      <span class="stat-value" id="house1_monthly_max">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📉 มิเตอร์ต่ำสุด:</span>
+                      <span class="stat-value" id="house1_monthly_min">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">📊 ค่าเฉลี่ย:</span>
+                      <span class="stat-value" id="house1_monthly_avg">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div
+                    id="chart_monthly_house1"
+                    style="height: 250px; width: 100%"
+                  >
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-success"></i> บ้านที่ 2
+                  (รายเดือน)
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">📈 มิเตอร์สูงสุด:</span>
+                      <span class="stat-value" id="house2_monthly_max">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📉 มิเตอร์ต่ำสุด:</span>
+                      <span class="stat-value" id="house2_monthly_min">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">📊 ค่าเฉลี่ย:</span>
+                      <span class="stat-value" id="house2_monthly_avg">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div
+                    id="chart_monthly_house2"
+                    style="height: 250px; width: 100%"
+                  >
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-home me-2 text-danger"></i> บ้านที่ 3
+                  (รายเดือน)
+                </div>
+                <div class="card-body">
+                  <div class="stats-box mb-3">
+                    <div class="stat-item">
+                      <span class="stat-label">📈 มิเตอร์สูงสุด:</span>
+                      <span class="stat-value" id="house3_monthly_max">-</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">📉 มิเตอร์ต่ำสุด:</span>
+                      <span class="stat-value" id="house3_monthly_min">-</span>
+                    </div>
+                    <div class="stat-item highlight">
+                      <span class="stat-label">📊 ค่าเฉลี่ย:</span>
+                      <span class="stat-value" id="house3_monthly_avg">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div
+                    id="chart_monthly_house3"
+                    style="height: 250px; width: 100%"
+                  >
+                    <div
+                      class="d-flex justify-content-center align-items-center h-100 text-muted"
+                    >
+                      <span
+                        ><i class="fas fa-spinner fa-spin me-2"></i>
+                        โหลด...</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- === แท็บ Admin === -->
+      <div class="tab-pane fade" id="admin" role="tabpanel">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-info text-white">
+                  <i class="fas fa-plus-circle me-2"></i> เพิ่มบ้านใหม่
+                </div>
+                <div class="card-body">
+                  <form id="addHouseForm">
+                    <div class="mb-3">
+                      <label for="houseName" class="form-label">ชื่อบ้าน</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="houseName"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="ownerName" class="form-label"
+                        >ชื่อ-นามสกุลเจ้าของบ้าน</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="ownerName"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="ownerAddress" class="form-label"
+                        >ที่อยู่</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="ownerAddress"
+                        rows="2"
+                        required
+                      ></textarea>
+                    </div>
+                    <div class="mb-3">
+                      <label for="ownerPhone" class="form-label"
+                        >เบอร์โทรศัพท์</label
+                      >
+                      <input
+                        type="tel"
+                        class="form-control"
+                        id="ownerPhone"
+                        pattern="[0-9]{10}"
+                        required
+                      />
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                      <i class="fas fa-plus"></i> เพิ่มบ้าน
+                    </button>
+                    <div id="addHouseMsg" class="mt-2"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-danger text-white">
+                  <i class="fas fa-trash-alt me-2"></i> ลบข้อมูลมิเตอร์ที่ผิด
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive readings-scroll">
+                    <table class="table table-bordered table-hover"id="deleteDataTable">
+                      <thead>
+                        <tr>
+                          <th>บ้าน</th>
+                          <th>ค่า</th>
+                          <th>เวลา</th>
+                          <th>ลบ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Data will be loaded here by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- รายการบ้านทั้งหมด -->
+           <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+              <i class="fas fa-home"></i> รายการบ้านในระบบ
+            </div>
+            <div class="card-body">
+              <div class="row" id="housesContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
