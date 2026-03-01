@@ -86,26 +86,28 @@ Monthly Usage By House
 router.get("/monthly-by-house", (req, res) => {
 
   const sql = `
-    SELECT 
+    SELECT
+      h.id AS house_id,
       h.house_name,
       DATE_FORMAT(m.reading_time,'%m/%Y') AS month,
       MAX(m.reading_value) AS total_unit
     FROM meter_readings m
     JOIN houses h ON h.id = m.house_id
-    GROUP BY h.house_name, month
-    ORDER BY STR_TO_DATE(
-      DATE_FORMAT(m.reading_time,'%m/%Y'),
-      '%m/%Y'
-    )
+    WHERE h.is_active = 1
+    GROUP BY h.id, month
+    ORDER BY STR_TO_DATE(CONCAT('01/',month),'%d/%m/%Y')
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql, (err, rows) => {
+
     if (err) {
-      console.error(err);
+      console.log(err);
       return res.status(500).json(err);
     }
 
-    res.json(result);
+    // ✅ ส่งข้อมูลตรง ๆ ไม่ต้องคำนวณลบแล้ว
+    res.json(rows);
+
   });
 
 });

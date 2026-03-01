@@ -1,0 +1,119 @@
+/* ===============================
+   PAGE SETUP
+=============================== */
+body {
+    background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-container {
+    max-width: 1000px;
+    padding: 20px;
+}
+
+/* ===============================
+   HEADER
+=============================== */
+.header-section {
+    margin-bottom: 50px;
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    
+    
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bolt-icon {
+    -webkit-text-fill-color: initial;
+    filter: drop-shadow(0 0 10px rgba(255,255,0,0.5));
+}
+
+/* ===============================
+   MENU CARD (Glassmorphism)
+=============================== */
+.menu-card {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+}
+
+.card-glass-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+}
+
+/* ===============================
+   ICON WRAPPER
+=============================== */
+.menu-icon-wrapper {
+    font-size: 50px;
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    transition: 0.3s ease;
+}
+
+/* ===============================
+   CARD HOVER EFFECTS
+=============================== */
+.menu-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-card:hover .menu-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ===============================
+   COLOR THEMES
+=============================== */
+.card-daily:hover { box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3); }
+.card-monthly:hover { box-shadow: 0 15px 30px rgba(46, 204, 113, 0.3); }
+.card-admin:hover { box-shadow: 0 15px 30px rgba(243, 156, 18, 0.3); }
+
+/* Title & Desc Styles */
+.menu-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.menu-desc {
+    font-size: 14px;
+    color: #94a3b8;
+}
