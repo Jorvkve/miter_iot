@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Admin</title>
+
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+<div class="container">
+<a class="navbar-brand" href="/daily">⚡ Smart Meter</a>
+
+<div>
+<a class="nav-link d-inline text-white" href="/daily">📊 รายวัน</a>
+<a class="nav-link d-inline text-white" href="/monthly">📅 รายเดือน</a>
+<a class="nav-link d-inline text-white" href="/admin">⚙️ Admin</a>
+</div>
+</div>
+</nav>
+
+<div class="container">
+
+<h3>⚙️ จัดการบ้าน</h3>
+
+<div class="card mb-3">
+<div class="card-body">
+
+<input id="houseName" class="form-control mb-2" placeholder="ชื่อบ้าน">
+<input id="owner" class="form-control mb-2" placeholder="เจ้าของ">
+<input id="phone" class="form-control mb-2" placeholder="เบอร์โทร">
+
+<button class="btn btn-primary" onclick="addHouse()">
+เพิ่มบ้าน
+</button>
+
+</div>
+</div>
+
+<div id="houseList"></div>
+
+</div>
+
+<script src="/js/admin.js"></script>
+
+</body>
+</html>
