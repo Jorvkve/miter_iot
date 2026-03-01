@@ -12,46 +12,153 @@ rel="stylesheet"
 />
 
 <link rel="stylesheet" href="/css/style.css">
-
 </head>
 
 <body class="bg-light">
 
+<!-- ================= NAVBAR ================= -->
 <nav class="navbar navbar-dark bg-dark mb-4">
 <div class="container">
-<a class="navbar-brand" href="/daily">⚡ Smart Meter</a>
+
+<a class="navbar-brand" href="index.html">
+⚡ Smart Meter System
+</a>
 
 <div>
 <a class="nav-link d-inline text-white" href="/daily">📊 รายวัน</a>
 <a class="nav-link d-inline text-white" href="/monthly">📅 รายเดือน</a>
 <a class="nav-link d-inline text-white" href="/admin">⚙️ Admin</a>
 </div>
+
 </div>
 </nav>
 
+
 <div class="container">
 
-<h3>⚙️ จัดการบ้าน</h3>
+<!-- ================= ADD HOUSE ================= -->
+<h3 class="mb-3">⚙️ จัดการบ้าน</h3>
 
-<div class="card mb-3">
+<div class="card mb-3 shadow-sm">
 <div class="card-body">
 
-<input id="houseName" class="form-control mb-2" placeholder="ชื่อบ้าน">
-<input id="owner" class="form-control mb-2" placeholder="เจ้าของ">
-<input id="phone" class="form-control mb-2" placeholder="เบอร์โทร">
+<input id="house_name"
+class="form-control mb-2"
+placeholder="ชื่อบ้าน">
 
-<button class="btn btn-primary" onclick="addHouse()">
+<input id="owner_name"
+class="form-control mb-2"
+placeholder="เจ้าของ">
+
+<input id="address"
+class="form-control mb-2"
+placeholder="ที่อยู่">
+
+<input id="phone"
+class="form-control mb-3"
+placeholder="เบอร์โทร">
+
+<button class="btn btn-primary"
+onclick="addHouse()">
 เพิ่มบ้าน
 </button>
 
 </div>
 </div>
 
+<!-- จำนวนบ้าน -->
+<div id="totalHouses"
+class="mb-3 fw-bold text-primary"></div>
+
+<!-- รายชื่อบ้าน -->
 <div id="houseList"></div>
+<template id="houseTemplate">
+
+<div class="card mb-3 shadow-sm">
+  <div class="card-body">
+
+    <div class="row">
+
+      <div class="col-md-9">
+        <h5 class="house-name"></h5>
+        <p class="owner"></p>
+        <p class="address"></p>
+        <p class="phone"></p>
+      </div>
+
+      <div class="col-md-3 text-end">
+        <button class="btn btn-warning btn-sm editBtn">
+          ✏️ แก้ไข
+        </button>
+
+        <button class="btn btn-danger btn-sm deleteBtn">
+          🗑 ลบ
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</template>
+<hr class="my-5">
+
+<!-- ================= METER ================= -->
+<h3 class="mb-3">📷 ข้อมูลมิเตอร์ทั้งหมด</h3>
+
+<div class="row mb-3">
+
+<div class="col-md-4">
+<input
+id="searchHouse"
+class="form-control"
+placeholder="🔎 ค้นหาชื่อบ้าน..."
+oninput="renderReadings()">
+</div>
+
+<div class="col-md-4">
+<select
+id="sortType"
+class="form-select"
+onchange="renderReadings()">
+
+<option value="latest">เวลาใหม่ล่าสุด</option>
+<option value="oldest">เวลาเก่าสุด</option>
+<option value="house">เรียงตามบ้าน</option>
+<option value="unit_high">หน่วยไฟมาก → น้อย</option>
+<option value="unit_low">หน่วยไฟน้อย → มาก</option>
+
+</select>
+</div>
 
 </div>
 
-<script src="/js/admin.js"></script>
+<div class="card shadow-sm">
+<div class="card-body">
+
+<table class="table table-striped">
+
+<thead class="table-dark">
+<tr>
+<th>บ้าน</th>
+<th>หน่วย</th>
+<th>เวลา</th>
+<th>รูป</th>
+<th>ลบ</th>
+</tr>
+</thead>
+
+<tbody id="readingTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+</div>
+
+<script src="../js/admin.js"></script>
 
 </body>
 </html>

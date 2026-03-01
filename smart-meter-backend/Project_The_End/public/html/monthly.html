@@ -21,12 +21,12 @@ rel="stylesheet"
 <!-- NAVBAR -->
 <nav class="navbar navbar-dark bg-dark mb-4">
 <div class="container">
-<a class="navbar-brand" href="/daily">⚡ Smart Meter</a>
+<a class="navbar-brand" href="index.html">⚡ Smart Meter System</a>
 
 <div>
-<a class="nav-link d-inline text-white" href="/daily">📊 รายวัน</a>
-<a class="nav-link d-inline text-white" href="/monthly">📅 รายเดือน</a>
-<a class="nav-link d-inline text-white" href="/admin">⚙️ Admin</a>
+<a class="nav-link d-inline text-white" href="daily.html">📊 รายวัน</a>
+<a class="nav-link d-inline text-white" href="monthly.html">📅 รายเดือน</a>
+<a class="nav-link d-inline text-white" href="admin.html">⚙️ Admin</a>
 </div>
 </div>
 </nav>
@@ -35,15 +35,19 @@ rel="stylesheet"
 
 <h3 class="mb-4">📅 การใช้ไฟรายเดือน</h3>
 
-<div class="card shadow">
+<div class="card shadow-sm p-4">
 <div class="card-body">
 <canvas id="monthlyChart"></canvas>
+<div class="mt-5">
+    <h4>การใช้ไฟฟ้าแยกรายบ้าน</h4>
+    <div id="houseMonthlyCharts" class="row"></div>
+</div>
 </div>
 </div>
 
 </div>
-
-<script src="/js/monthly.js"></script>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/monthly.js"></script>
 
 </body>
 </html>

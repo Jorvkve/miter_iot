@@ -7,6 +7,7 @@ async function initDashboard() {
   console.log("Dashboard Started ✅");
 
   await loadHouses();
+  await loadLatestReadings();
   await loadTotalUsageChart();
 }
 
@@ -16,7 +17,9 @@ async function initDashboard() {
 // ===============================
 async function loadHouses() {
 
-  const res = await fetch("http://localhost:3000/api/houses");
+  const res =
+    await fetch("http://localhost:3000/api/houses");
+
   const houses = await res.json();
 
   const container =
@@ -37,17 +40,11 @@ async function loadHouses() {
           </div>
 
           <div class="card-body">
-
-            <p><b>เจ้าของ:</b>
-            ${house.owner_name ?? "-"}</p>
-
-            <p><b>โทร:</b>
-            ${house.phone ?? "-"}</p>
-
+            <p><b>เจ้าของ:</b> ${house.owner_name ?? "-"}</p>
+            <p><b>โทร:</b> ${house.phone ?? "-"}</p>
             <p class="text-muted">
-            รอข้อมูลมิเตอร์...
+              กำลังโหลดข้อมูลมิเตอร์...
             </p>
-
           </div>
 
         </div>
@@ -58,14 +55,14 @@ async function loadHouses() {
 
 
 // ===============================
-// TOTAL USAGE CHART
+// TODAY CHART
 // ===============================
 async function loadTotalUsageChart() {
 
   try {
 
     const res =
-      await fetch("http://localhost:3000/api/readings/monthly-by-house");
+      await fetch("http://localhost:3000/api/readings/latest");
 
     const data = await res.json();
 
@@ -76,11 +73,15 @@ async function loadTotalUsageChart() {
 
     const ctx = canvas.getContext("2d");
 
-    const months =
-      [...new Set(data.map(d => d.month))];
+    // ✅ ชื่อบ้าน
+    const labels =
+      data.map(d => d.house_name);
 
-    const houses =
-      [...new Set(data.map(d => d.house_name))];
+    // ✅ หน่วยล่าสุด
+    const values =
+      data.map(d =>
+        Number(d.reading_value) || 0
+      );
 
     const colors = [
       "#3498db",
@@ -91,41 +92,21 @@ async function loadTotalUsageChart() {
       "#1abc9c"
     ];
 
-    const datasets = houses.map(
-      (house, index) => {
-
-        return {
-          label: house,
-          backgroundColor:
-            colors[index % colors.length],
-
-          data: months.map(month => {
-
-            const found = data.find(
-              d =>
-                d.month === month &&
-                d.house_name === house
-            );
-
-            return found
-              ? Number(found.total_unit)
-              : 0;
-          })
-        };
-      }
-    );
-
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels: months,
-        datasets
+        labels: labels,
+        datasets: [{
+          label: "หน่วยไฟล่าสุด (kWh)",
+          data: values,
+          backgroundColor: colors
+        }]
       },
       options: {
         responsive: true,
         plugins: {
           legend: {
-            position: "top"
+            display: true
           }
         }
       }
@@ -136,18 +117,26 @@ async function loadTotalUsageChart() {
   }
 }
 
+
+// ===============================
+// LATEST READINGS
+// ===============================
 async function loadLatestReadings() {
 
-  const res = await fetch("/api/readings/latest");
+  const res =
+    await fetch("http://localhost:3000/api/readings/latest");
+
   const data = await res.json();
 
-  const cards = document.querySelectorAll("#houseCards .card");
+  const cards =
+    document.querySelectorAll("#houseCards .card");
 
   data.forEach((reading, index) => {
 
     if (!cards[index]) return;
 
-    const body = cards[index].querySelector(".card-body");
+    const body =
+      cards[index].querySelector(".card-body");
 
     if (!reading.reading_value) {
       body.innerHTML = "ยังไม่มีข้อมูลมิเตอร์";
@@ -155,8 +144,11 @@ async function loadLatestReadings() {
     }
 
     body.innerHTML = `
-      <p><b>หน่วยล่าสุด:</b> ${reading.reading_value} หน่วย</p>
-      <p><b>เวลา:</b> ${new Date(reading.reading_time)
+      <p><b>หน่วยล่าสุด:</b>
+      ${reading.reading_value} หน่วย</p>
+
+      <p><b>เวลา:</b>
+      ${new Date(reading.reading_time)
         .toLocaleString()}</p>
 
       <img 
@@ -165,12 +157,4 @@ async function loadLatestReadings() {
       />
     `;
   });
-
 }
-
-async function init() {
-  await loadHouses();
-  await loadLatestReadings();
-}
-
-init();

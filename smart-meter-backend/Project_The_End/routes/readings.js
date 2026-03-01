@@ -51,6 +51,35 @@ router.delete("/:id", (req, res) => {
 
 /*
 ==============================
+TODAY READINGS (Daily Chart)
+==============================
+*/
+router.get("/today", (req, res) => {
+
+  const sql = `
+    SELECT 
+      h.house_name,
+      DATE_FORMAT(m.reading_time,'%H:%i') AS time,
+      m.reading_value
+    FROM meter_readings m
+    JOIN houses h ON h.id = m.house_id
+    WHERE DATE(m.reading_time) = CURDATE()
+    ORDER BY m.reading_time ASC
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json(err);
+    }
+
+    res.json(result);
+  });
+
+});
+
+/*
+==============================
 Monthly Usage By House
 ==============================
 */
@@ -60,17 +89,20 @@ router.get("/monthly-by-house", (req, res) => {
     SELECT 
       h.house_name,
       DATE_FORMAT(m.reading_time,'%m/%Y') AS month,
-      MAX(m.reading_value) - MIN(m.reading_value) AS total_unit
+      MAX(m.reading_value) AS total_unit
     FROM meter_readings m
     JOIN houses h ON h.id = m.house_id
     GROUP BY h.house_name, month
-    ORDER BY m.reading_time ASC
+    ORDER BY STR_TO_DATE(
+      DATE_FORMAT(m.reading_time,'%m/%Y'),
+      '%m/%Y'
+    )
   `;
 
   db.query(sql, (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: "DB error" });
+      return res.status(500).json(err);
     }
 
     res.json(result);
@@ -101,6 +133,28 @@ router.get("/latest", (req, res) => {
 
   db.query(sql, (err, result) => {
     if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+
+});
+
+// ===== ALL READINGS (ADMIN) =====
+router.get("/all", (req, res) => {
+
+  const sql = `
+    SELECT 
+      m.id,
+      h.house_name,
+      m.reading_value,
+      m.image_filename,
+      m.reading_time
+    FROM meter_readings m
+    JOIN houses h ON h.id = m.house_id
+    ORDER BY m.reading_time DESC
+  `;
+
+  db.query(sql,(err,result)=>{
+    if(err) return res.status(500).json(err);
     res.json(result);
   });
 

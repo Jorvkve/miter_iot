@@ -1,0 +1,79 @@
+/* ===============================
+   GLOBAL
+================================ */
+body {
+  background: #f4f6f9;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.navbar {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ===============================
+   PAGE TITLE
+================================ */
+.page-title {
+  text-align: center;
+  margin: 25px 0;
+  font-weight: 600;
+}
+
+/* ===============================
+   CARD
+================================ */
+.card {
+  border: none;
+  border-radius: 12px;
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* ===============================
+   CARD HEADER
+================================ */
+.card-header {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* ===============================
+   IMAGE METER
+================================ */
+.card img {
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* ===============================
+   CHART BOX
+================================ */
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ===============================
+   BUTTON
+================================ */
+.btn {
+  border-radius: 8px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 15px;
+  }
+}

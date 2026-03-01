@@ -4,53 +4,100 @@ const path = require("path");
 
 const app = express();
 
-/* ===== MIDDLEWARE ===== */
+/* ===============================
+   MIDDLEWARE
+=============================== */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ===== STATIC FILES ===== */
+
+/* ===============================
+   STATIC FILES
+=============================== */
+
+// รูปมิเตอร์
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
 );
 
+// public folder
 app.use(
   express.static(path.join(__dirname, "public"))
 );
 
-app.use("/html", express.static(path.join(__dirname, "public/html")));
 
-/* ===== API ROUTES ===== */
+/* ===============================
+   API ROUTES
+=============================== */
 app.use("/api/houses", require("./routes/houses"));
 app.use("/api/readings", require("./routes/readings"));
 app.use("/api/upload", require("./routes/upload"));
 
-/* ===== WEB PAGES ===== */
 
-// หน้าแรก (menu หลัก)
+/* ===============================
+   WEB ROUTES (สำคัญมาก)
+=============================== */
+
+// Home
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/html/index.html"));
+  res.sendFile(
+    path.join(__dirname, "public/html/index.html")
+  );
 });
 
-// Daily Dashboard
+// Daily
 app.get("/daily", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/html/daily.html"));
+  res.sendFile(
+    path.join(__dirname, "public/html/daily.html")
+  );
 });
 
-// Monthly Dashboard
+// Monthly
 app.get("/monthly", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/html/monthly.html"));
+  res.sendFile(
+    path.join(__dirname, "public/html/monthly.html")
+  );
 });
 
-// Admin Page
+// Admin
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/html/admin.html"));
+  res.sendFile(
+    path.join(__dirname, "public/html/admin.html")
+  );
 });
 
-/* ===== SERVER ===== */
+
+/* ===============================
+   รองรับ .html (กันพัง)
+=============================== */
+
+app.get("/index.html", (req, res) =>
+  res.redirect("/")
+);
+
+app.get("/daily.html", (req, res) =>
+  res.redirect("/daily")
+);
+
+app.get("/monthly.html", (req, res) =>
+  res.redirect("/monthly")
+);
+
+app.get("/admin.html", (req, res) =>
+  res.redirect("/admin")
+);
+
+
+/* ===============================
+   SERVER START
+=============================== */
 const PORT = 3000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running http://localhost:${PORT}`);
+  console.log("=================================");
+  console.log(`✅ Server running`);
+  console.log(`🌐 http://localhost:${PORT}`);
+  console.log("=================================");
 });
